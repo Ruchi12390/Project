@@ -4,7 +4,7 @@ import { Container, Form, FormGroup, Label, Input, Button, Alert } from 'reactst
 import { FaLock } from 'react-icons/fa';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
-export default function Login() {
+export default function Login({ onLogin }) {
     const navigate = useNavigate();
 
     const [values, setValues] = useState({
@@ -60,7 +60,7 @@ export default function Login() {
         }
 
         try {
-            const response = await fetch(`${process.env.REACT_APP_API_URL}/api/login`, {
+            const response = await fetch('http://localhost:5000/api/login', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(values)
@@ -69,8 +69,13 @@ export default function Login() {
             const data = await response.json();
 
             if (response.ok) {
-                localStorage.setItem('token', data.token);
-                navigate('/dashboard');
+                onLogin(data.token); // Call the onLogin function to update the token
+                localStorage.setItem('role', data.role);
+                if (data.role === 'teacher') {
+                    navigate('/builder');
+                } else {
+                    navigate('/dashboard');
+                }
             } else {
                 setValues({ ...values, error: data.error });
             }

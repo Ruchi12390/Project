@@ -8,3 +8,8 @@ export const logOut = () => ({
 });
 
 // Add other action creators here if needed
+// ../redux/actionCreators.js
+export const setPersonalDetails = (details) => ({
+  type: 'SET_PERSONAL_DETAILS',
+  payload: details
+});

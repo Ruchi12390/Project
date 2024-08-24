@@ -1,32 +1,45 @@
-// MainRouter.js
-import React from "react";
-import { Routes, Route } from 'react-router-dom';
-import NavBar from './components/NavBar';  // Make sure the path is correct
-import Footer from './components/Footer';  // Make sure the path is correct
-import Home from './components/Home';  // Make sure the path is correct
-import Signup from './components/Signup';  // Make sure the path is correct
-import 'bootstrap/dist/css/bootstrap.css';  // Ensure Bootstrap CSS is imported
+import React, { useState, useEffect } from "react";
+import { Routes, Route, useNavigate } from 'react-router-dom';
+import NavBar from './components/NavBar';  // Ensure the path is correct
+import Footer from './components/Footer';  // Ensure the path is correct
+import Home from './components/Home';  // Ensure the path is correct
+import Signup from './components/Signup';  // Ensure the path is correct
 import Login from './components/Login';
+import Marks from './components/Marks';
 import Attendance from './components/Attendance';
-const MainRouter = () => {
-    const storedJwt = localStorage.getItem('token');
+import Builder from "./components/Builder";
+import ProtectedRoute from './ProtectedRoute';
+import 'bootstrap/dist/css/bootstrap.css';  // Ensure Bootstrap CSS is imported
 
-    React.useEffect(() => {
-        console.log('Stored JWT:', storedJwt);
-        // Perform any additional actions if needed
-    }, [storedJwt]);
+const MainRouter = () => {
+    const [token, setToken] = useState(localStorage.getItem('token'));
+
+    const handleLogin = (newToken) => {
+        setToken(newToken);
+        localStorage.setItem('token', newToken);
+    };
+
+    const handleLogout = () => {
+        setToken(null);
+        localStorage.removeItem('token');
+        navigate('/login');
+    };
+
+    useEffect(() => {
+        setToken(localStorage.getItem('token'));
+    }, []);
 
     return (
         <div className="d-flex flex-column min-vh-100">
-            <NavBar />
+            <NavBar token={token} logOut={handleLogout} />
             <div className="flex-grow-1">
                 <Routes>
                     <Route path="/" element={<Home />} />
                     <Route path="/signup" element={<Signup />} />
-                    <Route path="/login" element={<Login />} />
+                    <Route path="/login" element={<Login onLogin={handleLogin} />} />
                     <Route path="/attendance" element={<Attendance />} />
-
-
+                    <Route path="/marks" element={<Marks />} />
+                    <Route path="/builder" element={<ProtectedRoute token={token}><Builder /></ProtectedRoute>} />
                 </Routes>
             </div>
             <Footer />
